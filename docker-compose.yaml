@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  krowi-db:
+    image: postgres:16-alpine
+    container_name: "krowi-db"
+    volumes:
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - krowi-db-data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    networks:
+      - krowi
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    restart: "on-failure"
+
+  krowi-db-admin:
+    image: dpage/pgadmin4
+    container_name: "krowi-db-admin"
+    depends_on:
+      - krowi-db
+    env_file:
+      - .env
+    networks:
+      - krowi
+    expose:
+      - 80
+    ports:
+      - "8080:80"
+    volumes:
+      - krowi-db-admin-data:/var/lib/pgadmin
+    restart: "on-failure"
+
+volumes:
+  krowi-db-data:
+  krowi-db-admin-data:
+
+networks:
+  krowi:

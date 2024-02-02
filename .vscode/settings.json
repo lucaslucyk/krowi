@@ -1,0 +1,11 @@
+{
+    "editor.defaultFormatter": "golang.go",
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.go$",
+                "cmd": "golines ${file} -w"
+            }
+        ]
+    },
+}
