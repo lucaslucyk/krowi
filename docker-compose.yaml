@@ -8,7 +8,7 @@ services:
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - krowi-db-data:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - docker.env
     networks:
       - krowi
     expose:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - krowi-db
     env_file:
-      - .env
+      - docker.env
     networks:
       - krowi
     expose:
@@ -32,6 +32,24 @@ services:
       - "8080:80"
     volumes:
       - krowi-db-admin-data:/var/lib/pgadmin
+    restart: "on-failure"
+
+  krowi-api:
+    image: krowi-api:0.2-alpine
+    build:
+      context: .
+      dockerfile: ./deployments/docker/DockerfileAlpine
+    container_name: "krowi-api"
+    depends_on:
+      - krowi-db
+    env_file:
+      - docker.env
+    networks:
+      - krowi
+    expose:
+      - 80
+    ports:
+      - "8000:80"
     restart: "on-failure"
 
 volumes:

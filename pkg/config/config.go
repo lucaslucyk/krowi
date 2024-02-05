@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -13,13 +14,16 @@ type Config struct {
 	DbUser     string
 	DbPassword string
 	DbName     string
-
+	// internal
 	SecretKey string
+	KrowiHost string
+	KrowiPort string
 }
 
 func New() (*Config, error) {
 	if err := godotenv.Load(".env"); err != nil {
-		return &Config{}, nil
+		fmt.Println("No .env file to load")
+		// return &Config{}, nil
 	}
 
 	dbPort, err := strconv.ParseUint(os.Getenv("DB_PORT"), 10, 32)
@@ -34,5 +38,7 @@ func New() (*Config, error) {
 		DbPassword: os.Getenv("DB_PASSWORD"),
 		DbName:     os.Getenv("DB_NAME"),
 		SecretKey:  os.Getenv("SECRET_KEY"),
+		KrowiHost:  os.Getenv("KROWI_HOST"),
+		KrowiPort:  os.Getenv("KROWI_PORT"),
 	}, nil
 }

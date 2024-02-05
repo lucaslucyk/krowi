@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/lucaslucyk/krowi/pkg/config"
 	"github.com/lucaslucyk/krowi/pkg/database"
 	router "github.com/lucaslucyk/krowi/pkg/routers"
 )
@@ -12,6 +14,10 @@ import (
 func main() {
 	// connect to db
 	database.Connect()
+	cfg, err := config.New()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// create app
 	app := fiber.New()
@@ -28,5 +34,9 @@ func main() {
 	router.SetupRoutes(app)
 
 	// run server
-	log.Fatal(app.Listen(":8000"))
+	log.Fatal(app.Listen(fmt.Sprintf(
+		"%s:%s",
+		cfg.KrowiHost,
+		cfg.KrowiPort,
+	)))
 }

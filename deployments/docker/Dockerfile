@@ -18,7 +18,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/krowi/main.go
 
 # Expone el puerto en el que la aplicación se ejecutará
-EXPOSE 8000
+EXPOSE 80
 
 # Comando para ejecutar la aplicación cuando el contenedor se inicia
 CMD ["./main"]

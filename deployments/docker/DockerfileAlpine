@@ -1,0 +1,30 @@
+# Go base image as builder
+FROM golang:1.21.6-alpine AS builder
+
+# app workdir
+WORKDIR /app
+
+# copy and download mod dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# copy entire project files
+COPY . .
+
+# Compile app
+# RUN go build -o main cmd/krowi/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/krowi/main.go
+
+# minimal image
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy binary only to reduce image size
+COPY --from=builder /app/main .
+
+# expose app port
+EXPOSE 80
+
+# compiled binary as entrypoint
+CMD ["./main"]
