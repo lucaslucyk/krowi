@@ -87,6 +87,7 @@ func LogIn(c *fiber.Ctx) error {
 	expDuration := time.Hour * 24
 
 	claims["sub"] = user.ID
+	claims["admin"] = user.IsAdmin
 	claims["exp"] = now.Add(expDuration).Unix()
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()
