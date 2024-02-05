@@ -8,14 +8,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/lucaslucyk/krowi/pkg/config"
-	"github.com/lucaslucyk/krowi/pkg/database"
 	"github.com/lucaslucyk/krowi/pkg/models"
+	users "github.com/lucaslucyk/krowi/pkg/services"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func SignUp(c *fiber.Ctx) error {
 	var payload *models.SignUpInput
-	db := database.DB
 
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
@@ -36,19 +35,18 @@ func SignUp(c *fiber.Ctx) error {
 		Password: string(hashedPassword),
 	}
 
-	result := db.Create(&newUser)
-	if result.Error != nil && strings.Contains(
-		result.Error.Error(), "duplicate key value violates unique") {
-		return c.Status(fiber.StatusConflict).JSON(
-			fiber.Map{"status": "fail", "message": "User already exists"})
-	} else if result.Error != nil {
+	err = users.CreateUser(&newUser)
+	if err != nil {
+		if err.Error() == users.ALREADY_EXISTS {
+			return c.Status(fiber.StatusConflict).JSON(
+				fiber.Map{"status": "fail", "message": "User already exists"})
+		}
+
 		return c.Status(fiber.StatusBadGateway).JSON(
 			fiber.Map{"status": "error", "message": "Something was wrong"})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(&newUser)
-	// return c.Status(fiber.StatusCreated).JSON(
-	// 	fiber.Map{"status": "success", "data": fiber.Map{"usuario": &newUser}})
 }
 
 func LogIn(c *fiber.Ctx) error {
@@ -59,20 +57,16 @@ func LogIn(c *fiber.Ctx) error {
 	}
 
 	var payload *models.SignInInput
-	db := database.DB
-
 	if err = c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			fiber.Map{"status": "fail", "message": err.Error()})
 	}
 
 	var user models.User
-	result := db.First(
-		&user, "email = ?", strings.ToLower(payload.Email))
-	if result.Error != nil {
+	err = users.GetUserByEmail(&user, strings.ToLower(payload.Email))
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			fiber.Map{
-				"status":  "fail",
 				"message": "Invalid email or password",
 			})
 	}
@@ -82,7 +76,6 @@ func LogIn(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			fiber.Map{
-				"status":  "fail",
 				"message": "Invalid email or password",
 			})
 	}

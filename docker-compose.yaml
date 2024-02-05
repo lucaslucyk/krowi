@@ -34,23 +34,23 @@ services:
       - krowi-db-admin-data:/var/lib/pgadmin
     restart: "on-failure"
 
-  krowi-api:
-    image: krowi-api:0.2-alpine
-    build:
-      context: .
-      dockerfile: ./deployments/docker/DockerfileAlpine
-    container_name: "krowi-api"
-    depends_on:
-      - krowi-db
-    env_file:
-      - docker.env
-    networks:
-      - krowi
-    expose:
-      - 80
-    ports:
-      - "8000:80"
-    restart: "on-failure"
+  # krowi-api:
+  #   image: krowi-api:0.2-alpine
+  #   build:
+  #     context: .
+  #     dockerfile: ./deployments/docker/DockerfileAlpine
+  #   container_name: "krowi-api"
+  #   depends_on:
+  #     - krowi-db
+  #   env_file:
+  #     - docker.env
+  #   networks:
+  #     - krowi
+  #   expose:
+  #     - 80
+  #   ports:
+  #     - "8000:80"
+  #   restart: "on-failure"
 
 volumes:
   krowi-db-data:
