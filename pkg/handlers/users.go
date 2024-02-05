@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lucaslucyk/krowi/models"
+	"github.com/lucaslucyk/krowi/pkg/models"
 )
 
 func GetMe(c *fiber.Ctx) error {

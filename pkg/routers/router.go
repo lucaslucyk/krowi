@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lucaslucyk/krowi/handlers"
-	"github.com/lucaslucyk/krowi/middleware"
+	"github.com/lucaslucyk/krowi/pkg/handlers"
+	"github.com/lucaslucyk/krowi/pkg/middleware"
 )
 
 func SetupRoutes(app *fiber.App) {

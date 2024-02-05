@@ -3,8 +3,8 @@ package database
 import (
 	"fmt"
 
-	"github.com/lucaslucyk/krowi/config"
-	"github.com/lucaslucyk/krowi/models"
+	"github.com/lucaslucyk/krowi/pkg/config"
+	"github.com/lucaslucyk/krowi/pkg/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

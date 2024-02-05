@@ -5,8 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/lucaslucyk/krowi/database"
-	router "github.com/lucaslucyk/krowi/routers"
+	"github.com/lucaslucyk/krowi/pkg/database"
+	router "github.com/lucaslucyk/krowi/pkg/routers"
 )
 
 func main() {

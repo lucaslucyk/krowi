@@ -7,9 +7,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
-	"github.com/lucaslucyk/krowi/config"
-	"github.com/lucaslucyk/krowi/database"
-	"github.com/lucaslucyk/krowi/models"
+	"github.com/lucaslucyk/krowi/pkg/config"
+	"github.com/lucaslucyk/krowi/pkg/database"
+	"github.com/lucaslucyk/krowi/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
