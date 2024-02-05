@@ -21,6 +21,7 @@ type Config struct {
 }
 
 func New() (*Config, error) {
+	// TODO: move to global var to store environ on memory
 	if err := godotenv.Load(".env"); err != nil {
 		fmt.Println("No .env file to load")
 		// return &Config{}, nil
