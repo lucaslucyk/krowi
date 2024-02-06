@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/lucaslucyk/krowi/pkg/config"
 	"github.com/lucaslucyk/krowi/pkg/database"
-	router "github.com/lucaslucyk/krowi/pkg/routers"
+	routers "github.com/lucaslucyk/krowi/pkg/routers"
 )
 
 func main() {
@@ -31,7 +31,8 @@ func main() {
 	}))
 
 	// setup routes
-	router.SetupRoutes(app)
+	_ = routers.AuthRouter(app, "/auth")
+	_ = routers.UsersRouter(app, "/users")
 
 	// run server
 	log.Fatal(app.Listen(fmt.Sprintf(

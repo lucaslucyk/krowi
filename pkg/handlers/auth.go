@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
-	"github.com/lucaslucyk/krowi/pkg/config"
 	"github.com/lucaslucyk/krowi/pkg/models"
+	"github.com/lucaslucyk/krowi/pkg/security"
 	users "github.com/lucaslucyk/krowi/pkg/services"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -51,7 +50,6 @@ func SignUp(c *fiber.Ctx) error {
 
 func LogIn(c *fiber.Ctx) error {
 	var err error
-	cfg, err := config.New()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -70,29 +68,16 @@ func LogIn(c *fiber.Ctx) error {
 				"message": "Invalid email or password",
 			})
 	}
-
-	err = bcrypt.CompareHashAndPassword(
-		[]byte(user.Password), []byte(payload.Password))
-	if err != nil {
+	if !security.PasswordVerify(user.Password, payload.Password) {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			fiber.Map{
 				"message": "Invalid email or password",
 			})
 	}
 
-	tokenByte := jwt.New(jwt.SigningMethodHS256)
-
-	now := time.Now().UTC()
-	claims := tokenByte.Claims.(jwt.MapClaims)
+	// create access token
 	expDuration := time.Hour * 24
-
-	claims["sub"] = user.ID
-	claims["admin"] = user.IsAdmin
-	claims["exp"] = now.Add(expDuration).Unix()
-	claims["iat"] = now.Unix()
-	claims["nbf"] = now.Unix()
-
-	token, err := tokenByte.SignedString([]byte(cfg.SecretKey))
+	token, err := security.CreateToken(&user, expDuration)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(
