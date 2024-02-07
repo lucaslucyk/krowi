@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"net/http"
+	"net/url"
+	"os"
 
 	authenticator "github.com/lucaslucyk/krowi/pkg/authenticators"
 
@@ -15,7 +17,7 @@ func OAuthHandler(auth *authenticator.Authenticator) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		state, err := generateRandomState()
 		if err != nil {
-			c.SendStatus(http.StatusInternalServerError)
+			return c.SendStatus(http.StatusInternalServerError)
 		}
 
 		//save the state inside the session
@@ -24,7 +26,7 @@ func OAuthHandler(auth *authenticator.Authenticator) fiber.Handler {
 		if err := session.Save(); err != nil {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
-		c.Redirect(auth.AuthCodeURL(state), http.StatusTemporaryRedirect)
+		_ = c.Redirect(auth.AuthCodeURL(state), http.StatusTemporaryRedirect)
 		return nil
 	}
 }
@@ -63,6 +65,7 @@ func CallbackHandler(auth *authenticator.Authenticator) fiber.Handler {
 		if err := idToken.Claims(&profile); err != nil {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
+		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)
 
 		if err := session.Save(); err != nil {
@@ -70,5 +73,39 @@ func CallbackHandler(auth *authenticator.Authenticator) fiber.Handler {
 		}
 
 		return c.Redirect("/oauth/me", http.StatusTemporaryRedirect)
+	}
+}
+
+func OLogoutHandler(auth *authenticator.Authenticator) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+
+		// clear session
+		session := c.Locals("session").(*session.Session)
+		if err := session.Destroy(); err != nil {
+			return c.SendStatus(fiber.StatusServiceUnavailable)
+		}
+
+		logoutUrl, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/v2/logout")
+		if err != nil {
+			return c.SendStatus(fiber.StatusServiceUnavailable)
+		}
+
+		scheme := "http"
+		if c.Context().IsTLS() {
+			scheme = "https"
+		}
+		returnTo, err := url.Parse(scheme + "://" + string(c.Context().Host()))
+		if err != nil {
+			return c.SendStatus(fiber.StatusServiceUnavailable)
+		}
+
+		parameters := url.Values{}
+		parameters.Add("returnTo", returnTo.String())
+		parameters.Add("client_id", os.Getenv("AUTH0_CLIENT_ID"))
+		logoutUrl.RawQuery = parameters.Encode()
+
+		_ = c.Redirect(logoutUrl.String(), http.StatusTemporaryRedirect)
+		return nil
 	}
 }

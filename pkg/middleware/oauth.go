@@ -13,7 +13,7 @@ const profile = "profile"
 func IsOAuthenticatedMiddleware(app *fiber.App) {
 	app.Use(func(c *fiber.Ctx) error {
 
-		if skipAuthentication(c.Path()) {
+		if !forceAuthentication(c.Path()) {
 			return c.Next()
 		}
 
@@ -21,7 +21,7 @@ func IsOAuthenticatedMiddleware(app *fiber.App) {
 		temp := session.Get("profile")
 		if temp == nil {
 			fmt.Printf("No User profile found. Redirecting to login page. Source : %v\n", c.Path())
-			return c.Redirect("/")
+			return c.Redirect("/oauth/login")
 		} else {
 			c.Locals("profile", profile)
 		}
@@ -32,9 +32,9 @@ func IsOAuthenticatedMiddleware(app *fiber.App) {
 	})
 }
 
-func skipAuthentication(userpath string) bool {
+func forceAuthentication(userpath string) bool {
 	//if you don't want to check for authentication add the endpoint to the paths slice
-	paths := []string{"/oauth/login", "/", "/oauth/callback"}
+	paths := []string{"/", "/oauth/me"}
 	for _, path := range paths {
 		if userpath == path {
 			return true

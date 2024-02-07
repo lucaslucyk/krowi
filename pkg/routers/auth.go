@@ -27,6 +27,7 @@ func OAuthRouter(
 	router := app.Group(path)
 
 	router.Get("/login", handlers.OAuthHandler(auth))
+	router.Get("/logout", handlers.OLogoutHandler(auth))
 	router.Get("/callback", handlers.CallbackHandler(auth))
 	router.Get("/me", handlers.GetOauthMe)
 

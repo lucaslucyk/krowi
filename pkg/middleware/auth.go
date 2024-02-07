@@ -20,8 +20,8 @@ func DeserializeUser(c *fiber.Ctx) error {
 
 	cfg, err = config.New()
 	if err != nil {
-		return c.Status(fiber.StatusServiceUnavailable).JSON(
-			fiber.Map{"status": "fail", "message": "Not available now"})
+		return c.Status(fiber.StatusUnauthorized).JSON(
+			fiber.Map{"message": "Not available now"})
 	}
 
 	authorization := c.Get("Authorization")
@@ -34,7 +34,7 @@ func DeserializeUser(c *fiber.Ctx) error {
 
 	if token == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(
-			fiber.Map{"status": "fail", "message": "Not authenticated"})
+			fiber.Map{"message": "Not authenticated"})
 	}
 
 	tokenByte, err := jwt.Parse(
@@ -50,7 +50,6 @@ func DeserializeUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(
 			fiber.Map{
-				"status":  "fail",
 				"message": fmt.Sprintf("invalid token: %v", err),
 			})
 	}
@@ -59,7 +58,6 @@ func DeserializeUser(c *fiber.Ctx) error {
 	if !ok || !tokenByte.Valid {
 		return c.Status(fiber.StatusUnauthorized).JSON(
 			fiber.Map{
-				"status":  "fail",
 				"message": "invalid token claim",
 			})
 	}
@@ -71,7 +69,6 @@ func DeserializeUser(c *fiber.Ctx) error {
 	if user.ID.String() != claims["sub"] {
 		return c.Status(fiber.StatusForbidden).JSON(
 			fiber.Map{
-				"status":  "fail",
 				"message": "user not found",
 			})
 	}
