@@ -11,6 +11,8 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/krowi/main.go",
             "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
         }
     ]
 }

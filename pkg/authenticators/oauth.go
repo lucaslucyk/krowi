@@ -3,6 +3,7 @@ package authenticator
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -13,13 +14,15 @@ import (
 type Authenticator struct {
 	*oidc.Provider
 	oauth2.Config
+	Options []oauth2.AuthCodeOption
 }
 
 // New instantiates the *Authenticator.
 func New() (*Authenticator, error) {
+	issuer := fmt.Sprintf("https://%s/", os.Getenv("AUTH0_DOMAIN"))
 	provider, err := oidc.NewProvider(
 		context.Background(),
-		"https://"+os.Getenv("AUTH0_DOMAIN")+"/",
+		issuer,
 	)
 	if err != nil {
 		return nil, err
@@ -30,12 +33,23 @@ func New() (*Authenticator, error) {
 		ClientSecret: os.Getenv("AUTH0_CLIENT_SECRET"),
 		RedirectURL:  os.Getenv("AUTH0_CALLBACK_URL"),
 		Endpoint:     provider.Endpoint(),
-		Scopes:       []string{oidc.ScopeOpenID, "profile"},
+		Scopes: []string{
+			oidc.ScopeOpenID,
+			"profile",
+			"isAdmin",
+			// fmt.Sprintf("%sisAdmin", issuer),
+		},
 	}
 
 	return &Authenticator{
 		Provider: provider,
 		Config:   conf,
+		Options: []oauth2.AuthCodeOption{
+			oauth2.SetAuthURLParam(
+				"audience",
+				os.Getenv("AUTH0_AUDIENCE"),
+			),
+		},
 	}, nil
 }
 

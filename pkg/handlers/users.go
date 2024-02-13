@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/lucaslucyk/krowi/pkg/models"
@@ -14,5 +16,8 @@ func GetMe(c *fiber.Ctx) error {
 func GetOauthMe(c *fiber.Ctx) error {
 	session := c.Locals("session").(*session.Session)
 	profile := session.Get("profile")
+
+	token := session.Get("access_token")
+	fmt.Printf("User token: %s\n", token)
 	return c.Status(fiber.StatusOK).JSON(profile)
 }

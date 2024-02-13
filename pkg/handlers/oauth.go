@@ -26,8 +26,8 @@ func OAuthHandler(auth *authenticator.Authenticator) fiber.Handler {
 		if err := session.Save(); err != nil {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
-		_ = c.Redirect(auth.AuthCodeURL(state), http.StatusTemporaryRedirect)
-		return nil
+		url := auth.AuthCodeURL(state, auth.Options...)
+		return c.Redirect(url, http.StatusTemporaryRedirect)
 	}
 }
 
@@ -65,13 +65,19 @@ func CallbackHandler(auth *authenticator.Authenticator) fiber.Handler {
 		if err := idToken.Claims(&profile); err != nil {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
+
+		// TODO: remove unnecessary session keys
 		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)
+		// fmt.Printf("access_token: %s\n", token.AccessToken)
 
 		if err := session.Save(); err != nil {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
-
+		// return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		// 	"access_token": token.AccessToken,
+		// 	"id_token":     idToken.AccessTokenHash,
+		// })
 		return c.Redirect("/oauth/me", http.StatusTemporaryRedirect)
 	}
 }
@@ -105,7 +111,6 @@ func OLogoutHandler(auth *authenticator.Authenticator) fiber.Handler {
 		parameters.Add("client_id", os.Getenv("AUTH0_CLIENT_ID"))
 		logoutUrl.RawQuery = parameters.Encode()
 
-		_ = c.Redirect(logoutUrl.String(), http.StatusTemporaryRedirect)
-		return nil
+		return c.Redirect(logoutUrl.String(), http.StatusTemporaryRedirect)
 	}
 }
