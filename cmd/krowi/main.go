@@ -23,12 +23,16 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// jwt validator
+	// EnsureValidToken := adaptor.HTTPMiddleware(middleware.ensureValidToken)
+
 	// create app
 	app := fiber.New()
 	gob.Register(map[string]interface{}{})
 	store := session.New()
 	middleware.SetupSessionStoreMiddleware(app, store)
-	middleware.IsOAuthenticatedMiddleware(app)
+	//middleware.IsOAuthenticatedMiddleware(app)
 
 	// config cors
 	app.Use(cors.New(cors.Config{
@@ -37,6 +41,7 @@ func main() {
 		AllowCredentials: true,
 		AllowHeaders:     "Origin, Content-Type, Accept",
 	}))
+	// app.Use(middleware.EnsureValidToken)
 
 	auth, err := authenticator.New()
 	if err != nil {

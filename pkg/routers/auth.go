@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	authenticator "github.com/lucaslucyk/krowi/pkg/authenticators"
 	"github.com/lucaslucyk/krowi/pkg/handlers"
+	"github.com/lucaslucyk/krowi/pkg/middleware"
 )
 
 func AuthRouter(app *fiber.App, path string) *fiber.Router {
@@ -30,6 +31,7 @@ func OAuthRouter(
 	router.Get("/logout", handlers.OLogoutHandler(auth))
 	router.Get("/callback", handlers.CallbackHandler(auth))
 	router.Get("/me", handlers.GetOauthMe)
+	router.Get("/me2", middleware.EnsureValidToken, handlers.GetOauthMe)
 
 	// return pointer to general purpouse
 	return &router

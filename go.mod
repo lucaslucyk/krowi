@@ -3,6 +3,7 @@ module github.com/lucaslucyk/krowi
 go 1.21.6
 
 require (
+	github.com/auth0/go-jwt-middleware/v2 v2.2.1
 	github.com/coreos/go-oidc/v3 v3.9.0
 	github.com/gofiber/fiber/v2 v2.52.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -37,4 +38,5 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gopkg.in/go-jose/go-jose.v2 v2.6.2 // indirect
 )
